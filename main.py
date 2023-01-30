@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from generator import gen
+from generator import assesment
+#from pre_parse import parseWords
+import time # input datetime
+
+
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import (
     get_redoc_html,
@@ -45,13 +49,13 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="RELEN Smart API documentation",
-        version="0.0.1",
-        description="This api and Documentation was developed by processor",
+        title="RELEN Smart Assessment API documentation",
+        version="0.0.2",
+        description="This API and Documentation was developed by processor",
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
-        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+        "url": "/static/logo-teal.png"
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -59,19 +63,52 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-class Address(BaseModel):
-    resource_link: str
+
+
+class Item(BaseModel):
+    link: str
+    item_id: str
+   
 
 @app.get("/")
 async def root():
     print("wait")
     return {"message": "Welcome Processor, its a good day."}
 
+# p = multiprocessing.Process(target=assesment)
 
 
 
-@app.post("/generate/")
-async def transpile(address: Address):
-    print(address.resource_link)
-    data = gen(address.resource_link)
-    return data
+@app.post("/items/")
+async def create_item(item: Item):
+    print(item)
+  
+    link = item.link
+    unique_id = item.item_id
+    # mylist = [1,2,3,4]
+  
+    # creating new process
+    # starting process
+    # wait until process is finished
+    # p = multiprocessing.Process(target=assesment)
+     # starting process 1
+    # p.start()
+    # p.join()
+    # return p
+    first = time.localtime().tm_min
+    sec = time.localtime().tm_sec
+    print ("begin------",first, sec)
+    result = assesment(link, unique_id)
+
+    first = time.localtime().tm_min
+    sec = time.localtime().tm_sec
+    print ("begin------",first, sec)
+    #total = assesment(link,unique_id)
+    #print(" total type  Below")
+    #print(type(total)) 1.18
+    #print(" total   Below")
+    #print(total)
+
+    #item["resource_link"] = resource_link.resource_link
+
+    return result
